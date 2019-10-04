@@ -1,0 +1,14 @@
+{
+  "operation": "UploadObs",
+  "device_ID": "MY_DEVICE00023",
+  "msg_body": [
+    {
+      "name": "sensor1",
+      "observation": "25.10"
+    },
+    {
+      "name": "sensor2",
+      "observation": "46.20"
+    }
+  ]
+}

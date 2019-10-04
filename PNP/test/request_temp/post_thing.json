@@ -1,0 +1,7 @@
+{
+  "name": "MY_DEVICE0001",
+  "description": "CSRSR's sensor",
+  "properties": {
+    "UID": "MY_DEVICE0001"
+  }
+}
