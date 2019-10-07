@@ -9,7 +9,7 @@ GPIO.setwarnings(False)
 class SerialPortManager():
     def __init__(self):
         self.ser = serial.Serial(
-            port='/dev/ttyUSB1',
+            port='/dev/ttyUSB0',
             baudrate=9600,
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
@@ -53,8 +53,5 @@ class SerialPortManager():
     
     def close(self):
         self.ser.close()
-        
-        
-        
         
         

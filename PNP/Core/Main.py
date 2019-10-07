@@ -1,5 +1,5 @@
-from . import SerialPortManager_module
-from . import PNP_procedure
+from SerialPortManager_module import SerialPortManager
+from PNP_procedure import PNPRequest
 import json
 
 # loop
@@ -9,7 +9,7 @@ while True:
     
     # read msg from XBee
     while True:
-        msg = SerialPortManager_module().readMsg()
+        msg = SerialPortManager.readMsg()
         if msg != '' and msg.endswith('<CR>'):
             msg = msg.replace('<CR>','').strip()
             # print (msg)
@@ -17,3 +17,4 @@ while True:
     
     # doRequest
     PNP_procedure(msg)
+    

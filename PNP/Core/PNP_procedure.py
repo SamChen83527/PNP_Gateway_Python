@@ -1,6 +1,6 @@
 import json
-from .LookupTableManager_module import LookupTableManager
-from .HTTPManager_module import HTTPManager
+from LookupTableManager_module import LookupTableManager
+from HTTPManager_module import HTTPManager
 # from .SerialPortManager_module import SerialPortManager
 
 class PNPRequest():

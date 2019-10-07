@@ -1,4 +1,4 @@
-from ..Core.PNP_procedure import PNPRequest
+from PNP_procedure import PNPRequest
 
 # # Existed device
 # UploadObs_req = '''
