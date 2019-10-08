@@ -1,0 +1,1 @@
+{"Datastream_id_list": {"Temperature measurement": 8, "Relative humidity measurement": 9}, "service_URL": "http://140.115.110.69:8080/sta_taskingservice/STA/v1.0", "device_ID": "MY_DEVICE00024", "Thing_ID": 7}

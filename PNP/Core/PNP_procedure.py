@@ -1,7 +1,7 @@
 import json
 from LookupTableManager_module import LookupTableManager
 from HTTPManager_module import HTTPManager
-# from .SerialPortManager_module import SerialPortManager
+from SerialPortManager_module import SerialPortManager
 
 class PNPRequest():
     def __init__(self, request):
@@ -80,7 +80,7 @@ class PNPRequest():
 
                 # POST message body
                 target = "Datastreams(" + str(datastream_id) + ")/Observations"
-                messageBody = "{\"result\":" + result + "}"
+                messageBody = "{\"result\":" + str(result) + "}"
 
                 httpmanager = HTTPManager(self.service_url)
                 httpmanager.sendPOST(target, messageBody)
@@ -93,28 +93,24 @@ class PNPRequest():
 
 
     def doSendServURL(self):
-        getservurl = '''
-            {
-                "operation": "GetServURL",
-                "device_ID": "''' + self.device_ID + '''"
-            }<CR>
-        '''
-
+        getservurl = '''{"operation": "GetServURL","device_ID": "''' + self.device_ID + '''"}'''
+        print (getservurl)
+        
         # To-Do
         # # ask service url from device
-        # serialportmanager = SerialPortManager()
-        # sendservurl = serialportmanager.sendRequ(GetServURL)
+        serialportmanager = SerialPortManager()
+        sendservurl = serialportmanager.sendRequ(getservurl)
 
         # TO-DO: varify reponse in SerialPortManager or doSendServURL?
 
         # Simulated response
-        sendservurl = '''
-            {
-                "operation": "SendServURL",
-                "device_ID": "MY_DEVICE00023",
-                "service_URL": "http://140.115.110.69:8080/sta_taskingservice/STA/v1.0"
-            }
-        '''
+        # sendservurl = '''
+        #     {
+        #         "operation": "SendServURL",
+        #         "device_ID": "MY_DEVICE00023",
+        #         "service_URL": "http://140.115.110.69:8080/sta_taskingservice/STA/v1.0"
+        #     }
+        # '''
 
         # Parse response
         sendservurl_jsonobject = json.loads(sendservurl)
@@ -210,7 +206,7 @@ class PNPRequest():
 
                 # POST message body
                 target = "Datastreams(" + str(datastream_id) + ")/Observations"
-                messageBody = "{\"result\":" + result + "}"
+                messageBody = "{\"result\":" + str(result) + "}"
 
                 httpmanager = HTTPManager(self.service_url)
                 httpmanager.sendPOST(target, messageBody)

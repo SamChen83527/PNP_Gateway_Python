@@ -29,6 +29,7 @@ class SerialPortManager():
         device_ID = request_json["device_ID"]
 
         # send request
+        request = request + '<CR>'
         self.writeMsg(request)
 
         # read response from device
@@ -38,7 +39,8 @@ class SerialPortManager():
             break_count = break_count + 1
             if msg != '' and msg.endswith('<CR>'):
                 msg = msg.replace('<CR>','').strip()
-                msg_json = json.load(msg)
+                print ('resp: ', msg)
+                msg_json = json.loads(msg)
                 if msg_json["device_ID"] == device_ID:
                     break
             elif break_count == 10:
