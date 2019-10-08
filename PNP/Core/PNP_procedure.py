@@ -18,9 +18,9 @@ class PNPRequest():
             self.observations = self.request["msg_body"]
             self.doUploadObs()
 
-        # elif self.operation == "UpdateStatus":
-        #     self.doUpdateStatus()
-        #
+        elif self.operation == "UpdateStatus":
+            self.doUpdateStatus()
+
         # elif self.operation == "SendServURL":
         #     self.doSendServURL)
         #
@@ -224,6 +224,95 @@ class PNPRequest():
             serialportmanager = SerialPortManager()
             sendservurl = serialportmanager.sendRequ(confirm)
 
+    def doUpdateStatus(self):
+        #   UpdateStatus request:
+        #
+        #   {
+        #       "operation":"UpdateStatus",
+        #       "device_ID":"MY_DEVICE00023"
+        #   }
+
+        # Query lookup table
+        queryer = LookupTableManager()
+        if queryer.isExist(self.device_ID):
+            print ("Device exists:")
+            
+            record = json.loads(queryer.queryLookupTable(self.device_ID))
+            print (record)
+            print ('\n')
+            #   Lookup table record:
+            #
+            #   {
+            #       "device_ID":"MY_DEVICE00023",
+            #       "Thing_ID":"6",
+            #       "Datastream_id_list": {},
+            #       "TaskingCapability_parameter_list": {
+            #           
+            #       },
+            #       "service_URL": "140.115.110.69:8080/SensorThingsAPIPart2/v1.0"
+            #   }
+            self.service_url = record["service_URL"]
+            
+            
+            if ('TaskingCapability_parameter_list' in record):
+                # TO-DO
+                pass
+            else:
+                # TO-DO
+                pass
+            
+            
+        else not queryer.isExist(self.device_ID):
+            print ("Device doesn't exists:")
+            
+            getservurlanddesc = '''{"operation": "GetServURLandDesc","device_ID": "''' + self.device_ID + '''"}'''
+            print (getservurlanddesc)
+            
+            # # ask service url from device
+            serialportmanager = SerialPortManager()
+            sendservurlanddesc = serialportmanager.sendRequ(getservurlanddesc)
+            
+            # Parse response
+            sendservurlanddesc_jsonobject = json.loads(sendservurlanddesc)
+            self.service_url = sendservurl_jsonobject["service_URL"]
+            self.msg_body = sendservurl_jsonobject["msg_body"]
+
+            # Send HTTP GET to query device from SensorThings API
+            get_thing = self.service_url + "/Things?$filter=properties/UID%20eq%20%27" + self.device_ID + "%27&$select=id&$expand=Datastreams($select=id,name;$count=true),TaskingCapabilities($select=id,name;$count=true)&$count=true"
+                        
+            httpmanager = HTTPManager(self.service_url)
+            get_response = httpmanager.sendGET(get_thing)
+
+            # parse get response
+            get_thing_from_sta_jsonbject = json.loads(get_response)
+            #   {
+            #       "@iot.count": 1,
+            #       "value": [
+            #           {
+            #               "Datastreams": [
+            #                   {
+            #                       "name": "Relative humidity measurement",
+            #                       "@iot.id": 7
+            #                   },
+            #                   {
+            #                       "name": "Temperature measurement",
+            #                       "@iot.id": 6
+            #                   }
+            #               ],
+            #               "Datastreams@iot.count": 2,
+            #               "TaskingCapabilities": [
+            #                   {
+            #                       "name": "Hue",
+            #                       "@iot.id": 133
+            #                   }
+            #               ],
+            #               "TaskingCapabilities@iot.count": 0,
+            #               "@iot.id": 6
+            #           }
+            #       ]
+            #   }
+            
+            
 
 
 
@@ -249,23 +338,6 @@ class PNPRequest():
 
 
 
-
-
-
-
-
-
-
-
-
-#    def doUpdateStatus(self):
-#             
-#             
-#             
-#    def doSendServURL(self):
-#        
-#    
-#    
 #    def doSendDesc(self):
 #             
 #             
