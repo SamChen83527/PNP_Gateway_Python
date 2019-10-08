@@ -85,7 +85,13 @@ class PNPRequest():
                 httpmanager = HTTPManager(self.service_url)
                 httpmanager.sendPOST(target, messageBody)
 
-            # TO-DO: Send Confirm
+            # Send Confirm
+            confirm = '''{"operation": "Confirm","device_ID": "''' + self.device_ID + '''"}'''
+            print (confirm)
+        
+            # # ask service url from device
+            serialportmanager = SerialPortManager()
+            sendservurl = serialportmanager.sendRequ(confirm)
         else:
             print ("Device doesn't exist.")
             self.doSendServURL()
@@ -96,7 +102,6 @@ class PNPRequest():
         getservurl = '''{"operation": "GetServURL","device_ID": "''' + self.device_ID + '''"}'''
         print (getservurl)
         
-        # To-Do
         # # ask service url from device
         serialportmanager = SerialPortManager()
         sendservurl = serialportmanager.sendRequ(getservurl)
@@ -148,6 +153,7 @@ class PNPRequest():
         thing_number = get_thing_from_sta_jsonbject["@iot.count"];
         if thing_number == 0:
             print('Device ' + self.device_ID + " doesn't exist in service")
+            # TO-DO: doSendDesc()
         else:
             print('Device ' + self.device_ID + " exists in service")
 
@@ -211,7 +217,12 @@ class PNPRequest():
                 httpmanager = HTTPManager(self.service_url)
                 httpmanager.sendPOST(target, messageBody)
 
-
+            confirm = '''{"operation": "Confirm","device_ID": "''' + self.device_ID + '''"}'''
+            print (confirm)
+        
+            # ask service url from device
+            serialportmanager = SerialPortManager()
+            sendservurl = serialportmanager.sendRequ(confirm)
 
 
 

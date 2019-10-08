@@ -1,1 +1,1 @@
-{"Thing_ID": 206, "service_URL": "140.115.110.69:8080/SensorThingsAPIPart2/v1.0", "device_ID": "MY_DEVICE100801", "Datastream_id_list": {"sensor2": 118, "sensor1": 117}}
+{"Datastream_id_list": {"sensor1": 117, "sensor2": 118}, "device_ID": "MY_DEVICE100801", "service_URL": "140.115.110.69:8080/SensorThingsAPIPart2/v1.0", "Thing_ID": 206}
