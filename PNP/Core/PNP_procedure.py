@@ -88,8 +88,6 @@ class PNPRequest():
             # Send Confirm
             confirm = '''{"operation": "Confirm","device_ID": "''' + self.device_ID + '''"}'''
             print (confirm)
-        
-            # # ask service url from device
             serialportmanager = SerialPortManager()
             sendservurl = serialportmanager.sendRequ(confirm)
         else:
@@ -217,10 +215,9 @@ class PNPRequest():
                 httpmanager = HTTPManager(self.service_url)
                 httpmanager.sendPOST(target, messageBody)
 
+            # Send Confirm
             confirm = '''{"operation": "Confirm","device_ID": "''' + self.device_ID + '''"}'''
             print (confirm)
-        
-            # ask service url from device
             serialportmanager = SerialPortManager()
             sendservurl = serialportmanager.sendRequ(confirm)
 
@@ -306,26 +303,147 @@ class PNPRequest():
             #                       "@iot.id": 133
             #                   }
             #               ],
-            #               "TaskingCapabilities@iot.count": 0,
+            #               "TaskingCapabilities@iot.count": 1,
             #               "@iot.id": 6
             #           }
             #       ]
             #   }
             
-            
+            thing_number = get_thing_from_sta_jsonbject["@iot.count"];
+            if thing_number == 0:
+                print('Device ' + self.device_ID + " doesn't exist in service")
+                # TO-DO:
+                # 1. Ceate Thing/Datastreams/TaskingCapabilities
+                # 2. Update lookup table
+            else:
+                print('Device ' + self.device_ID + " exists in service")
+                
+                # NOTE:
+                # JSON in Python -
+                #   json string -> loads() -> dict
+                #   dict -> dumps() -> json string
 
+                # thing dict
+                thing_from_sta = get_thing_from_sta_jsonbject["value"][0]
+                thing_id_from_sta = thing_from_sta["@iot.id"]
+                # datastreams dict
+                datastreams_from_sta = thing_from_sta["Datastreams"]
+                datastreams_number = thing_from_sta["Datastreams@iot.count"]
+                # taskingcapabilities dict
+                taskingcapabilities_from_sta = thing_from_sta["TaskingCapabilities"]
+                taskingcapabilities_number = thing_from_sta['TaskingCapabilities@iot.count']
 
+                descriptionfile = json.loads(self.msg_body)
+                
+                # Lookup table record:
+                #
+                #   {
+                #       "device_ID":"MY_DEVICE00023",
+                #       "Thing_ID":"6",
+                #       "service_URL": "140.115.110.69:8080/SensorThingsAPIPart2/v1.0",
+                #       "Datastream_id_list": {},
+                #       "TaskingCapability_parameter_list": {
+                #             "buzzer": {
+                #                 "taskingParameters": {
+                #                     "field": [
+                #                         {
+                #                             "name": "buzz_time",
+                #                             "use": "Mandatory",
+                #                             "description": "ring buzzer several times",
+                #                             "definition": {
+                #                                 "unitOfMeasurement": "times",
+                #                                 "allowedValues": [
+                #                                     {
+                #                                         "Min": 1,
+                #                                         "Max": 10
+                #                                     }
+                #                                 ],
+                #                                 "inputType": "Integer"
+                #                             }
+                #                         }
+                #                     ]
+                #                 },
+                #                 "zigbeeProtocol": {
+                #                     "messageBody": "TaskingDevice_1003003:buzzer:{buzz_time}",
+                #                     "addressingSH": "",
+                #                     "messageDataType": "application/text",
+                #                     "addressingSL": ""
+                #                  },
+                #             "TCID": 174
+                #         }
+                #   }
+                
+                lookuptable_dict = {}
+                lookuptable_dict['device_ID'] = self.device_ID
+                lookuptable_dict['Thing_ID'] = thing_id_from_sta
+                lookuptable_dict['service_URL'] = self.service_url
+                
+                datastream_id_list = {}
+                for datstream_count in range(datastreams_number):
+                    datastream_name = datastreams_from_sta[datstream_count]["name"]
+                    datastream_id = datastreams_from_sta[datstream_count]["@iot.id"]
+                    datastream_id_list[datastream_name] = datastream_id
+                    
+                taskingcapability_parameter_list = {}
+                # for each taskingcapability from SensorThings API GET
+                for taskingcapability_count in range(taskingcapabilities_number):
+                    taskingcapability_name = taskingcapabilities_from_sta[taskingcapability_count]["name"]
+                    taskingcapability_id = taskingcapabilities_from_sta[taskingcapability_count]["@iot.id"]
+                    
+                    # for each taskingcapability from description file
+                    # match the parameter name
+                    http_messagebody = ''
+                    for taskingcapabilities_from_descriptionfile in descriptionfile["TaskingCapabilities"]:
+                        # if match then PATCH
+                        if taskingcapabilities_from_descriptionfile['name'] == taskingcapability_name:
+                            taskingParameters = taskingcapabilities_from_descriptionfile['taskingParameters']
+                            if 'zigbeeProtocol' in taskingcapabilities_from_descriptionfile:
+                                protocol = taskingcapabilities_from_descriptionfile['zigbeeProtocol']
+                            for parameter_count in range(len(taskingParameters['field'])):
+                                parameter = taskingParameters['field'][parameter_count]
+                                http_messagebody = http_messagebody + '"' + parameter['name'] + '":{' + parameter['name'] + '}'
+                                if parameter_count<len(taskingParameters['field'])-1:
+                                    http_messagebody = http_messagebody + ','
+                            http_messagebody = '{' + http_messagebody + '"TaskingCapability_name":"' + taskingcapability_name + '","device_ID":"' + self.device_ID + '"}'
+                            print ('http_messagebody: ' + http_messagebody)
+                            
+                            # PATCH
+                            #     {
+                            #         "httpProtocol":
+                            #             {
+                            #                 "httpMethod":"POST",
+                            #                 "absoluteResourcePath": "<gatewayurl>",
+                            #                 "contentType":"application/json",
+                            #                 "messageBody":"<http_messagebody>"
+                            #             }                            #         
+                            #     }
+                            
+                            # TO-DO: gateway_url
+                            patch_content = {'httpProtocol':'POST','absoluteResourcePath':gateway_url, 'contentType':'application/json', 'messageBody':http_messagebody}
+                            
+                            
+                    taskingcapability_parameter_list[taskingcapability_name] = {'taskingParameters':taskingParameters, 'zigbeeProtocol':protocol, 'TCID':taskingcapability_id}
+                    
+                lookuptable_dict["Datastream_id_list"] = datastream_id_list
+                lookuptable_dict["TaskingCapability_parameter_list"] = taskingcapability_parameter_list
+                
+                # Update lookup table                
+                lookuptable_jsonstring = json.dumps(lookuptable_dict)
+                print(lookuptable_jsonstring)
+                LookupTableManager().updateLookupTable(self.device_ID, lookuptable_jsonstring)
+                
+                # Send Confirm
+                confirm = '''{"operation": "Confirm","device_ID": "''' + self.device_ID + '''"}'''
+                print (confirm)            
+                serialportmanager = SerialPortManager()
+                sendservurl = serialportmanager.sendRequ(confirm)
+                
+                
+                
+                
+                    
 
-
-
-
-
-
-
-
-
-
-
+    
 
 
 
