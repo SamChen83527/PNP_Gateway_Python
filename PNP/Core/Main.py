@@ -17,5 +17,4 @@ while True:
             break
     
     # doRequest
-    PNPRequest(msg)
-    
+    PNPRequest(msg)    

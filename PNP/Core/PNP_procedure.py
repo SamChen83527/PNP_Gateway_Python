@@ -255,8 +255,45 @@ class PNPRequest():
             
             
             if ('TaskingCapability_parameter_list' in record):
-                # TO-DO
-                pass
+                # Update Gateway URL
+                self.service_url = record['service_URL']
+                taskingcapability_parameter_list = record['TaskingCapability_parameter_list']
+                
+                http_messagebody = ''
+                for taskingcapability_name in taskingcapability_parameter_list:
+                    taskingParameters = taskingcapability_parameter_list[taskingcapability_name]['taskingParameters']
+                    if 'zigbeeProtocol' in taskingcapability_parameter_list[taskingcapability_name]:
+                        protocol = taskingcapability_parameter_list[taskingcapability_name]['zigbeeProtocol']
+                    taskingcapability_id = taskingcapability_parameter_list[taskingcapability_name]['TCID']
+                    
+                    for parameter_count in range(len(taskingParameters['field'])):
+                        parameter = taskingParameters['field'][parameter_count]
+                        http_messagebody = http_messagebody + '"' + parameter['name'] + '":{' + parameter['name'] + '}'
+                        if parameter_count<len(taskingParameters['field'])-1:
+                            http_messagebody = http_messagebody + ','
+                    http_messagebody = '{' + http_messagebody + ',"TaskingCapability_name":"' + taskingcapability_name + '","device_ID":"' + self.device_ID + '"}'
+                    
+                    # PATCH
+                    #     {
+                    #         "httpProtocol":
+                    #             {
+                    #                 "httpMethod":"POST",
+                    #                 "absoluteResourcePath": "<gatewayurl>",
+                    #                 "contentType":"application/json",
+                    #                 "messageBody":"<http_messagebody>"
+                    #             }      
+                    #     }
+                    
+                    gateway_url = ServerConfigManager().getGatewayURL()
+                    print ('gateway_url: ' + gateway_url)
+                    patch_content = {'httpProtocol':'POST','absoluteResourcePath':gateway_url, 'contentType':'application/json', 'messageBody':http_messagebody}
+                    patch_content = json.dumps(patch_content)                    
+                    print ('patch_content: ' + patch_content)
+                    
+                     # PATCH
+                    httpmanager = HTTPManager(self.service_url)
+                    get_response = httpmanager.sendPatch('TaskingCapabilities(' + str(taskingcapability_id) + ')', patch_content)
+                           
             else:
                 # TO-DO
                 pass
@@ -371,8 +408,9 @@ class PNPRequest():
                 #                     "addressingSH": "",
                 #                     "messageDataType": "application/text",
                 #                     "addressingSL": ""
-                #                  },
-                #             "TCID": 174
+                #                 },
+                #                 "TCID": 174
+                #             }
                 #         }
                 #   }
                 
@@ -407,7 +445,7 @@ class PNPRequest():
                                 http_messagebody = http_messagebody + '"' + parameter['name'] + '":{' + parameter['name'] + '}'
                                 if parameter_count<len(taskingParameters['field'])-1:
                                     http_messagebody = http_messagebody + ','
-                            http_messagebody = '{' + http_messagebody + '"TaskingCapability_name":"' + taskingcapability_name + '","device_ID":"' + self.device_ID + '"}'
+                            http_messagebody = '{' + http_messagebody + ',"TaskingCapability_name":"' + taskingcapability_name + '","device_ID":"' + self.device_ID + '"}'
                             print ('http_messagebody: ' + http_messagebody)
                             
                             # PATCH
@@ -418,7 +456,7 @@ class PNPRequest():
                             #                 "absoluteResourcePath": "<gatewayurl>",
                             #                 "contentType":"application/json",
                             #                 "messageBody":"<http_messagebody>"
-                            #             }                            #         
+                            #             }     
                             #     }
                             
                             gateway_url = ServerConfigManager().getGatewayURL()
@@ -445,27 +483,3 @@ class PNPRequest():
                 print (confirm)            
                 serialportmanager = SerialPortManager()
                 sendservurl = serialportmanager.sendRequ(confirm)
-                
-                
-                
-                
-                    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-#    def doSendDesc(self):
-#             
-#             
-#             
-#    def doSendServURLandDesc(self):
