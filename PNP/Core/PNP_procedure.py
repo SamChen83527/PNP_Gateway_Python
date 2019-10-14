@@ -293,6 +293,12 @@ class PNPRequest():
                      # PATCH
                     httpmanager = HTTPManager(self.service_url)
                     get_response = httpmanager.sendPatch('TaskingCapabilities(' + str(taskingcapability_id) + ')', patch_content)
+                    
+                # Send Confirm
+                confirm = '''{"operation": "Confirm","device_ID": "''' + self.device_ID + '''"}'''
+                print (confirm)
+                serialportmanager = SerialPortManager()
+                sendservurl = serialportmanager.sendRequ(confirm)
                            
             else:
                 # TO-DO
