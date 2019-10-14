@@ -33,4 +33,18 @@ class HTTPManager():
         print ('\n')
         return r.text
 
-    # def sendPatch(self):
+    def sendPatch(self, target, PATCH_data):
+        url = self.url + "/" + target
+        if "http://" not in url:
+            url = "http://" + url
+        print ('Send PATCH:')
+        print ('url: ' + url)
+        print ('message body: ' + PATCH_data)
+        
+        r = requests.patch(url, data = PATCH_data)
+        print ('status code: {statusCode}'.format(statusCode = r.status_code))
+
+
+
+
+

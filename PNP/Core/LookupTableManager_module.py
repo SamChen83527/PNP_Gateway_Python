@@ -1,7 +1,6 @@
 import os
 
 class LookupTableManager():
-    reading = ''
     
     def __init__(self):
         pass
@@ -24,14 +23,3 @@ class LookupTableManager():
         filePath = '../lookupTable/'+deviceID+'.txt'
         record = open(filePath,'w')
         record.write(data)
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        

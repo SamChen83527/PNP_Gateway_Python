@@ -2,13 +2,16 @@ import json
 from LookupTableManager_module import LookupTableManager
 from HTTPManager_module import HTTPManager
 from SerialPortManager_module import SerialPortManager
+from ServerConfigManager_module import ServerConfigManager
+
 
 class PNPRequest():
     def __init__(self, request):
         self.request = json.loads(request)
         self.operation = self.request["operation"]
         self.device_ID = self.request["device_ID"]
-        self.msg_body = self.request["msg_body"]
+        
+        self.msg_body = None
         self.observations = None
         self.service_url = None
         self.doRequest()
@@ -100,7 +103,7 @@ class PNPRequest():
         getservurl = '''{"operation": "GetServURL","device_ID": "''' + self.device_ID + '''"}'''
         print (getservurl)
         
-        # # ask service url from device
+        # ask service url from device
         serialportmanager = SerialPortManager()
         sendservurl = serialportmanager.sendRequ(getservurl)
 
@@ -259,20 +262,20 @@ class PNPRequest():
                 pass
             
             
-        else not queryer.isExist(self.device_ID):
+        elif not queryer.isExist(self.device_ID):
             print ("Device doesn't exists:")
             
             getservurlanddesc = '''{"operation": "GetServURLandDesc","device_ID": "''' + self.device_ID + '''"}'''
             print (getservurlanddesc)
             
-            # # ask service url from device
+            # ask service url from device
             serialportmanager = SerialPortManager()
             sendservurlanddesc = serialportmanager.sendRequ(getservurlanddesc)
             
             # Parse response
             sendservurlanddesc_jsonobject = json.loads(sendservurlanddesc)
-            self.service_url = sendservurl_jsonobject["service_URL"]
-            self.msg_body = sendservurl_jsonobject["msg_body"]
+            self.service_url = sendservurlanddesc_jsonobject["service_URL"]
+            self.msg_body = sendservurlanddesc_jsonobject["msg_body"]
 
             # Send HTTP GET to query device from SensorThings API
             get_thing = self.service_url + "/Things?$filter=properties/UID%20eq%20%27" + self.device_ID + "%27&$select=id&$expand=Datastreams($select=id,name;$count=true),TaskingCapabilities($select=id,name;$count=true)&$count=true"
@@ -418,9 +421,14 @@ class PNPRequest():
                             #             }                            #         
                             #     }
                             
-                            # TO-DO: gateway_url
+                            gateway_url = ServerConfigManager().getGatewayURL()
+                            print (gateway_url)
                             patch_content = {'httpProtocol':'POST','absoluteResourcePath':gateway_url, 'contentType':'application/json', 'messageBody':http_messagebody}
+                            patch_content = json.dumps(patch_content)
                             
+                            # PATCH
+                            httpmanager = HTTPManager(self.service_url)
+                            get_response = httpmanager.sendPatch('TaskingCapabilities(' + str(taskingcapability_id) + ')', patch_content)
                             
                     taskingcapability_parameter_list[taskingcapability_name] = {'taskingParameters':taskingParameters, 'zigbeeProtocol':protocol, 'TCID':taskingcapability_id}
                     
