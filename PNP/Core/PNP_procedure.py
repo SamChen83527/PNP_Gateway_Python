@@ -92,7 +92,7 @@ class PNPRequest():
             confirm = '''{"operation": "Confirm","device_ID": "''' + self.device_ID + '''"}'''
             print (confirm)
             serialportmanager = SerialPortManager()
-            sendservurl = serialportmanager.sendRequ(confirm)
+            serialportmanager.sendRequ_withoutResponse(confirm)
         else:
             print ("Device doesn't exist.")
             self.doSendServURL()
@@ -222,7 +222,7 @@ class PNPRequest():
             confirm = '''{"operation": "Confirm","device_ID": "''' + self.device_ID + '''"}'''
             print (confirm)
             serialportmanager = SerialPortManager()
-            sendservurl = serialportmanager.sendRequ(confirm)
+            serialportmanager.sendRequ_withoutResponse(confirm)
 
     def doUpdateStatus(self):
         #   UpdateStatus request:
@@ -298,7 +298,7 @@ class PNPRequest():
                 confirm = '''{"operation": "Confirm","device_ID": "''' + self.device_ID + '''"}'''
                 print (confirm)
                 serialportmanager = SerialPortManager()
-                sendservurl = serialportmanager.sendRequ(confirm)
+                serialportmanager.sendRequ_withoutResponse(confirm)
                            
             else:
                 # TO-DO
@@ -488,4 +488,4 @@ class PNPRequest():
                 confirm = '''{"operation": "Confirm","device_ID": "''' + self.device_ID + '''"}'''
                 print (confirm)            
                 serialportmanager = SerialPortManager()
-                sendservurl = serialportmanager.sendRequ(confirm)
+                serialportmanager.sendRequ_withoutResponse(confirm)

@@ -1,5 +1,6 @@
 from SerialPortManager_module import SerialPortManager
 from PNP_procedure import PNPRequest
+import TaskingServletManager
 import json
 
 # loop
@@ -18,3 +19,4 @@ while True:
     
     # doRequest
     PNPRequest(msg)
+    print ('\nPrcedure finished\n\n')

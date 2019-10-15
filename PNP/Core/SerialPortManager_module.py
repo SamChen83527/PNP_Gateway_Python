@@ -49,6 +49,9 @@ class SerialPortManager():
             time.sleep(1)
         return msg
     
+    def sendRequ_withoutResponse(self, msg):
+        self.ser.write(str.encode(msg + '<CR>'))
+        
     def isOpen(self):
         serIsOpen = self.ser.isOpen()
         return serIsOpen
