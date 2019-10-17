@@ -1,6 +1,5 @@
 from SerialPortManager_module import SerialPortManager
 from PNP_procedure import PNPRequest
-import TaskingServletManager
 import json
 
 # loop
@@ -14,7 +13,7 @@ while True:
         msg = serialportmanager.readMsg()
         if msg != '' and msg.endswith('<CR>'):
             msg = msg.replace('<CR>','').strip()
-            # print (msg)
+            print (msg)
             break
     
     # doRequest

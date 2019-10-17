@@ -57,6 +57,7 @@ def task():
             # Send device task
             serialportmanager = SerialPortManager()
             serialportmanager.sendRequ_withoutResponse(device_task)
+            app.logger.info(device_task)
             
             return 'OK'
         
