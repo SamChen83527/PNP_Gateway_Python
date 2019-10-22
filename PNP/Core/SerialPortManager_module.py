@@ -18,6 +18,7 @@ class SerialPortManager():
         )
 
     def readMsg(self):
+        #msg = str(self.ser.readline().strip().encode('utf-8'))
         msg = str(self.ser.readline().strip(), 'utf-8')
         return msg
 

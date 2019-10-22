@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 from SerialPortManager_module import SerialPortManager
 from PNP_procedure import PNPRequest
 import json

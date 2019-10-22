@@ -286,7 +286,7 @@ class PNPRequest():
                     
                     gateway_url = ServerConfigManager().getGatewayURL()
                     print ('gateway_url: ' + gateway_url)
-                    patch_content = {'httpProtocol':'POST','absoluteResourcePath':gateway_url, 'contentType':'application/json', 'messageBody':http_messagebody}
+                    patch_content = {'httpProtocol':{"httpMethod":'POST','absoluteResourcePath':gateway_url,'contentType':'application/json','messageBody':http_messagebody}}
                     patch_content = json.dumps(patch_content)                    
                     print ('patch_content: ' + patch_content)
                     
@@ -467,7 +467,7 @@ class PNPRequest():
                             
                             gateway_url = ServerConfigManager().getGatewayURL()
                             print (gateway_url)
-                            patch_content = {'httpProtocol':'POST','absoluteResourcePath':gateway_url, 'contentType':'application/json', 'messageBody':http_messagebody}
+                            patch_content = {'httpProtocol':{"httpMethod":'POST','absoluteResourcePath':gateway_url,'contentType':'application/json','messageBody':http_messagebody}}
                             patch_content = json.dumps(patch_content)
                             
                             # PATCH
